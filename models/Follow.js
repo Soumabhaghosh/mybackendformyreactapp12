@@ -1,5 +1,5 @@
-const usersCollection = require('../db').db().collection("users")
-const followsCollection = require('../db').db().collection("follows")
+const usersCollection = require('../index').db().collection("users")
+const followsCollection = require('../index').db().collection("follows")
 const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 

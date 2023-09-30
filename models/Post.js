@@ -1,5 +1,5 @@
-const postsCollection = require('../db').db().collection("posts")
-const followsCollection = require('../db').db().collection("follows")
+const postsCollection = require('../index').db().collection("posts")
+const followsCollection = require('../index').db().collection("follows")
 const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 const sanitizeHTML = require('sanitize-html')
