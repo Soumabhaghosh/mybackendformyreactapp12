@@ -100,7 +100,7 @@ Post.reusablePostQuery = function(uniqueOperations, visitorId, finalOperations =
       post.authorId = undefined
 
       post.author = {
-        username: post.author.username,
+        username: post.author.username || "",
         avatar: new User(post.author, true).avatar
       }
 
