@@ -28,6 +28,7 @@ exports.checkToken = function (req, res) {
 
 exports.apiMustBeLoggedIn = function (req, res, next) {
   try {
+
     req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET)
     next()
   } catch (e) {

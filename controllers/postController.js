@@ -1,6 +1,14 @@
 const Post = require("../models/Post")
 
 exports.apiCreate = function(req, res) {
+  
+  req.body={
+    title:req.body.title,
+    body:req.body.body,
+    token:req.body.token,
+    imgBuffer:req.file.buffer
+  }
+  
   let post = new Post(req.body, req.apiUser._id)
   post
     .create()
