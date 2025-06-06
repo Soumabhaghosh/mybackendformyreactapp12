@@ -4,10 +4,12 @@ const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 const sanitizeHTML = require('sanitize-html')
 var ImageKit = require("imagekit");
+const dotenv = require("dotenv")
+
 var imagekit = new ImageKit({
-  publicKey: "public_O3ll5wmq4wmMXnUGh/GVFR58uoE=",
-  privateKey: "private_cGXNAnvGaH8nQQegrYx8Km8TeGI=",
-  urlEndpoint: "https://ik.imagekit.io/y0jvoe8jf/"
+  publicKey: process.env.PUBLICKEY,
+  privateKey: process.env.PRIVATEKEY,
+  urlEndpoint: process.env.URLENDPOINT
 });
 
 postsCollection.createIndex({ title: "text", body: "text" })
@@ -37,41 +39,50 @@ Post.prototype.validate = function () {
   if (this.data.title == "") { this.errors.push("You must provide a title.") }
   if (this.data.body == "") { this.errors.push("You must provide post content.") }
 }
-const uploadImg = async (buffer)=>{
+
+const uploadImg = async (buffer) => {
   try {
-    const result= await imagekit.upload({
-        file: buffer, //required
-        fileName: "my_file_name1.jpg",   //required
-        tags: ["tag1", "tag2"]
-      });
-      
-      
-      return result.url
+    const result = await imagekit.upload({
+      file: buffer, //required
+      fileName: "my_file_name1.jpg",   //required
+      tags: ["tag1", "tag2"]
+    });
+    return result
   } catch (error) {
     return null
   }
 }
-Post.prototype.create =  function () {
+
+const deleteImg = async (imgId) =>{
+  try {
+    const result = await imagekit.deleteFile(imgId);
+  } catch (error) {
+    return null
+  }
+}   
+
+Post.prototype.create = function () {
   return new Promise(async (resolve, reject) => {
     this.cleanUp()
     this.validate()
     if (!this.errors.length) {
       // save post into database
-      
-      
-      
-      const imglink= await uploadImg(this.data.img)
-      
+
+
+
+      const uploadResult = await uploadImg(this.data.img)
+
       finaldata = {
         title: this.data.title,
         body: this.data.body,
         createdDate: this.data.createdDate,
         author: this.data.author,
-        img:imglink
+        img: uploadResult.url,
+        fileId: uploadResult.fileId
 
       }
       // console.log(finaldata);
-      
+
 
 
       postsCollection.insertOne(finaldata).then((info) => {
@@ -126,6 +137,7 @@ Post.reusablePostQuery = function (uniqueOperations, visitorId, finalOperations 
           body: 1,
           createdDate: 1,
           img: 1,
+          fileId: 1,
           authorId: "$author",
           author: { $arrayElemAt: ["$authorDocument", 0] }
         }
@@ -133,7 +145,7 @@ Post.reusablePostQuery = function (uniqueOperations, visitorId, finalOperations 
     ]).concat(finalOperations)
 
     let posts = await postsCollection.aggregate(aggOperations).toArray()
-  
+
 
     // clean up author property in each post object
     posts = posts.map(function (post) {
@@ -182,8 +194,11 @@ Post.delete = function (postIdToDelete, currentUserId) {
   return new Promise(async (resolve, reject) => {
     try {
       let post = await Post.findSingleById(postIdToDelete, currentUserId)
+      console.log(post);
+
       if (post.isVisitorOwner) {
         await postsCollection.deleteOne({ _id: new ObjectID(postIdToDelete) })
+        await deleteImg(post.fileId)
         resolve()
       } else {
         reject()
