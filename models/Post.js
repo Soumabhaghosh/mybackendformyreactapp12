@@ -44,7 +44,7 @@ const uploadImg = async (buffer)=>{
         fileName: "my_file_name1.jpg",   //required
         tags: ["tag1", "tag2"]
       });
-      console.log(result.url);
+      
       
       return result.url
   } catch (error) {
@@ -57,7 +57,7 @@ Post.prototype.create =  function () {
     this.validate()
     if (!this.errors.length) {
       // save post into database
-      console.log(this.data);
+      
       
       
       const imglink= await uploadImg(this.data.img)
