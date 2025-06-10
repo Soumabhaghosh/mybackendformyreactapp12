@@ -35,4 +35,7 @@ apiRouter.get("/profile/:username/following", userController.ifUserExists, userC
 apiRouter.post("/addFollow/:username", userController.apiMustBeLoggedIn, followController.apiAddFollow)
 apiRouter.post("/removeFollow/:username", userController.apiMustBeLoggedIn, followController.apiRemoveFollow)
 
+//forget password
+apiRouter.post("/forgetpass",userController.forgetPassword)
+apiRouter.post("/createnewpass",userController.createNewPassword)
 module.exports = apiRouter

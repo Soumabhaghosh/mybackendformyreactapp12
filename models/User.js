@@ -124,11 +124,31 @@ User.doesEmailExist = function(email) {
 
     let user = await usersCollection.findOne({email: email})
     if (user) {
-      resolve(true)
+      resolve(user)
     } else {
       resolve(false)
     }
   })
+}
+User.changePassword =  function (emailId,newPassword) {
+  // try {
+  //   let salt = bcrypt.genSaltSync(10)
+  //   await usersCollection.findOneAndUpdate({email:emailId},{ $set: { password: bcrypt.hashSync(newPassword,salt)} })
+  //   return true
+  // } catch (error) {
+  //   return false
+  // }
+
+  return new Promise(async function (resolve , reject) {
+    try {
+    let salt = bcrypt.genSaltSync(10)
+    await usersCollection.findOneAndUpdate({email:emailId},{ $set: { password: bcrypt.hashSync(newPassword,salt)} })
+    resolve(true)
+  } catch (error) {
+    reject(error)
+  }
+  })
+  
 }
 
 module.exports = User

@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken")
 
 // how long a token lasts before expiring
 const tokenLasts = "30d"
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 60 });
 
 exports.apiGetPostsByUsername = async function (req, res) {
   try {
@@ -151,5 +153,89 @@ exports.profileFollowing = async function (req, res) {
     res.json(following)
   } catch (e) {
     res.status(500).send("Error")
+  }
+}
+
+
+const nodemailer = require('nodemailer');
+
+// Create transporter using your Gmail credentials
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'soumagok@gmail.com',
+    pass: 'jgzt swei soqj tqyx'  // Use App Password, not your actual password
+  }
+});
+
+exports.forgetPassword = async function (req, res) {
+
+  try {
+    let emailBool = await User.doesEmailExist(req.body.email)
+
+    if (emailBool) {
+
+      const random6DigitStr = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+      cache.set(emailBool.email, random6DigitStr);
+
+      const value = cache.get(emailBool.email);
+
+      const mailOptions = {
+        from: 'soumagok@gmail.com',
+        to: req.body.email,
+        subject: 'Reset Your Password - Memobook',
+        text: `Hi ,
+
+We received a request to reset your password for your Memobook account.
+
+To reset your password, please copy the code below:
+${value}
+
+If you did not request a password reset, you can safely ignore this email.
+
+This code will expire in 1 minute for your security.
+
+Thanks,  
+The Memobook Team`
+      };
+
+      // Send the mail
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          res.status(400).send('Error sending mail');
+        } else {
+          res.status(200).send('Email sent:');
+        }
+      });
+
+      
+    }
+    else{
+      res.json("Email Not Found")
+    }
+  } catch (error) {
+    res.json(error)
+  }
+
+
+}
+
+exports.createNewPassword = async function (req, res) {
+  if (cache.get(req.body.email) == req.body.key) {
+
+    try {
+      await User.changePassword(req.body.email,req.body.newpassword)
+      res.json("Passowrd changed");
+      
+    } catch (error) {
+      res.json(error)
+    }
+    
+    
+  }
+  else {
+    res.json("Wrong Code or EmailId");
+
   }
 }
