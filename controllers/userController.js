@@ -228,10 +228,10 @@ The [Your App Name] Team`,
         .send(mailOptions)
         .then(() => {res.send("Email sent");
         }, error => {
-          res.error(error);
+          res.send(error);
 
           if (error.response) {
-            res.error(error.response.body)
+            res.send(error.response.body)
           }
         });
 
