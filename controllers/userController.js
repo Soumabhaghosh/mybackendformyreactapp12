@@ -2,6 +2,7 @@ const User = require("../models/User")
 const Post = require("../models/Post")
 const Follow = require("../models/Follow")
 const jwt = require("jsonwebtoken")
+const dotenv = require("dotenv")
 
 // how long a token lasts before expiring
 const tokenLasts = "30d"
@@ -170,6 +171,12 @@ const transporter = nodemailer.createTransport({
   secure: true,
 });
 
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID);
+
+
+
 exports.forgetPassword = async function (req, res) {
 
   try {
@@ -184,39 +191,49 @@ exports.forgetPassword = async function (req, res) {
       const value = cache.get(emailBool.email);
 
       const mailOptions = {
-        from: 'soumagok@gmail.com',
         to: req.body.email,
-        subject: 'Reset Your Password - Memobook',
-        text: `Hi ,
+        from: 'thisismemobook@gmail.com', // Use the email address or domain you verified above
+        subject: 'Sending with Twilio SendGrid is Fun',
+        text: `Hi [User Name],
 
-We received a request to reset your password for your Memobook account.
+We received a request to reset your password for your [Your App Name] account.
 
-To reset your password, please copy the code below:
 ${value}
 
 If you did not request a password reset, you can safely ignore this email.
 
-This code will expire in 1 minute for your security.
+This link will expire in 15 minutes for your security.
 
 Thanks,  
-The Memobook Team`
+The [Your App Name] Team`,
+       
       };
 
       // Send the mail
 
-      await new Promise((resolve, reject) => {
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
+      // await new Promise((resolve, reject) => {
+      //   transporter.sendMail(mailOptions, (error, info) => {
+      //     if (error) {
 
-            res.status(400).send(error);
-            resolve()
-          } else {
+      //       res.status(400).send(error);
+      //       resolve()
+      //     } else {
 
-            res.status(200).send('Email sent:');
-            reject()
+      //       res.status(200).send('Email sent:');
+      //       reject()
+      //     }
+      //   });
+      // });
+      sgMail
+        .send(mailOptions)
+        .then(() => {res.send("Email sent");
+        }, error => {
+          res.error(error);
+
+          if (error.response) {
+            res.error(error.response.body)
           }
         });
-      });
 
 
 
