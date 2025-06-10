@@ -203,7 +203,7 @@ The Memobook Team`
       // Send the mail
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          res.status(400).send('Error sending mail');
+          res.status(400).send(error);
         } else {
           res.status(200).send('Email sent:');
         }
