@@ -193,7 +193,7 @@ exports.forgetPassword = async function (req, res) {
       const mailOptions = {
         to: req.body.email,
         from: 'thisismemobook@gmail.com', // Use the email address or domain you verified above
-        subject: 'Resting YOur Password -Memobook',
+        subject: 'Resting YOur Password - Memobook',
         text: `Hi ,
 
 We received a request to reset your password for your Memobook account.
