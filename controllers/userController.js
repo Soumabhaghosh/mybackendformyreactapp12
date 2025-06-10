@@ -201,17 +201,26 @@ The Memobook Team`
       };
 
       // Send the mail
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          res.status(400).send(error);
-        } else {
-          res.status(200).send('Email sent:');
-        }
+
+      await new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+           
+            res.status(400).send(error);
+             resolve()
+          } else {
+            
+            res.status(200).send('Email sent:');
+            reject()
+          }
+        });
       });
 
-      
+
+
+
     }
-    else{
+    else {
       res.json("Email Not Found")
     }
   } catch (error) {
@@ -225,14 +234,14 @@ exports.createNewPassword = async function (req, res) {
   if (cache.get(req.body.email) == req.body.key) {
 
     try {
-      await User.changePassword(req.body.email,req.body.newpassword)
+      await User.changePassword(req.body.email, req.body.newpassword)
       res.json("Passowrd changed");
-      
+
     } catch (error) {
       res.json(error)
     }
-    
-    
+
+
   }
   else {
     res.json("Wrong Code or EmailId");
