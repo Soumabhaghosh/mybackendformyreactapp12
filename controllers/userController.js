@@ -193,19 +193,20 @@ exports.forgetPassword = async function (req, res) {
       const mailOptions = {
         to: req.body.email,
         from: 'thisismemobook@gmail.com', // Use the email address or domain you verified above
-        subject: 'Sending with Twilio SendGrid is Fun',
-        text: `Hi [User Name],
+        subject: 'Resting YOur Password -Memobook',
+        text: `Hi ,
 
-We received a request to reset your password for your [Your App Name] account.
+We received a request to reset your password for your Memobook account.
 
+To reset your password, please copy the code below:
 ${value}
 
 If you did not request a password reset, you can safely ignore this email.
 
-This link will expire in 15 minutes for your security.
+This code will expire in 1 minute for your security.
 
-Thanks,  
-The [Your App Name] Team`,
+Thanks, 
+The Memobook Team`,
        
       };
 
