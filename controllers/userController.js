@@ -161,11 +161,13 @@ const nodemailer = require('nodemailer');
 
 // Create transporter using your Gmail credentials
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  port: 465,
+  host: "smtp.gmail.com",
   auth: {
     user: 'soumagok@gmail.com',
     pass: 'jgzt swei soqj tqyx'  // Use App Password, not your actual password
-  }
+  },
+  secure: true,
 });
 
 exports.forgetPassword = async function (req, res) {
@@ -205,11 +207,11 @@ The Memobook Team`
       await new Promise((resolve, reject) => {
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
-           
+
             res.status(400).send(error);
-             resolve()
+            resolve()
           } else {
-            
+
             res.status(200).send('Email sent:');
             reject()
           }
